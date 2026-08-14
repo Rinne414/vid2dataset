@@ -37,12 +37,21 @@ from urllib.parse import unquote, urlparse
 
 log = logging.getLogger(__name__)
 
-# Where to cache the downloaded runtime
-RUNTIME_DIR = (
-    Path(os.environ.get("LOCALAPPDATA", str(Path.home() / ".local")))
-    / "vid2dataset"
-    / "gpu_runtime"
-)
+def default_runtime_dir() -> Path:
+    """Per-user GPU cache. Windows uses LOCALAPPDATA; Linux/macOS use XDG."""
+    override = os.environ.get("VID2DATASET_GPU_RUNTIME")
+    if override:
+        return Path(override)
+    if sys.platform == "win32":
+        root = Path(os.environ.get("LOCALAPPDATA") or (Path.home() / "AppData" / "Local"))
+        return root / "vid2dataset" / "gpu_runtime"
+    xdg = os.environ.get("XDG_DATA_HOME")
+    root = Path(xdg) if xdg else Path.home() / ".local" / "share"
+    return root / "vid2dataset" / "gpu_runtime"
+
+
+# Where to cache the downloaded runtime (Windows .exe) or look for a cache.
+RUNTIME_DIR = default_runtime_dir()
 MANIFEST_FILE = "manifest.json"
 RUNTIME_VERSION = (
     "torch2.11.0+numpy2.4.6"  # bump when wheel pins change; mismatch invalidates cache
@@ -734,6 +743,38 @@ def _download_with_progress(
                 if progress:
                     progress(label, done, total)
     tmp.replace(target)
+
+
+def ensure_gpu_runtime() -> tuple[bool, str]:
+    """Make CUDA PyTorch importable if possible. Never raises.
+
+    Order:
+    1. Already-importable torch with CUDA (Linux/macOS source installs, or a
+       previously activated Windows cache).
+    2. Activate the per-user Windows GPU cache if it exists.
+    """
+    try:
+        import torch  # type: ignore[import-not-found]
+
+        if bool(getattr(torch.cuda, "is_available", lambda: False)()):
+            return True, ""
+    except Exception:
+        pass
+
+    cache_torch = RUNTIME_DIR / "torch" / "__init__.py"
+    if cache_torch.is_file():
+        return activate_runtime()
+
+    if sys.platform == "win32":
+        return False, (
+            "GPU runtime is not downloaded yet. Enable GPU once in the app "
+            "to fetch the CUDA build, or extract will keep using CPU filters."
+        )
+    return False, (
+        "CUDA PyTorch is not installed in this environment. On Linux/macOS: "
+        "pip install torch --index-url https://download.pytorch.org/whl/cu126 "
+        "(use cu128 for RTX 50-series). Extraction still runs on CPU."
+    )
 
 
 def activate_runtime() -> tuple[bool, str]:

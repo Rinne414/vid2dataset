@@ -199,11 +199,11 @@ describe("Store", () => {
 
     await store.start();
 
-    expect(store.config.gpu_accel).toBe(false);
+    expect(store.config.gpu_accel).toBe(true);
     expect(store.run.status).toBe("running");
-    expect(store.run.log.some((line) => line.includes("Continuing on CPU"))).toBe(true);
+    expect(store.run.log.some((line) => line.includes("filters use CPU"))).toBe(true);
     expect(startRun).toHaveBeenCalled();
     const sent = vi.mocked(startRun).mock.calls[0]?.[0] as { gpu_accel?: boolean };
-    expect(sent.gpu_accel).toBe(false);
+    expect(sent.gpu_accel).toBe(true);
   });
 });

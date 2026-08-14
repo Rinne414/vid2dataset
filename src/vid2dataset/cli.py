@@ -198,6 +198,14 @@ def extract(  # noqa: PLR0913
         bool,
         typer.Option("--dry-run", help="Print resolved config and exit without extracting."),
     ] = False,
+    gpu: Annotated[
+        bool,
+        typer.Option(
+            "--gpu",
+            help="Enable GPU video decode + CUDA filters. Falls back to CPU if "
+            "PyTorch/CUDA is missing (Windows cache or Linux pip torch).",
+        ),
+    ] = False,
 ) -> None:
     """Extract a LoRA training set from one or more videos."""
 
@@ -250,6 +258,8 @@ def extract(  # noqa: PLR0913
         overrides["html_gallery"] = False
     if no_skip_existing:
         overrides["skip_existing"] = False
+    if gpu:
+        overrides["gpu_accel"] = True
     if segment:
         try:
             overrides["segments"] = _parse_segments(segment)

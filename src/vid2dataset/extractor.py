@@ -671,12 +671,17 @@ def run_pipeline(
 
     cfg.output.mkdir(parents=True, exist_ok=True)
 
-    # GPU acceleration probe: validate once before processing.
-    # Log GPU pipeline state
+    # GPU acceleration: activate a cached/source CUDA runtime if present.
+    # Missing torch must not abort the run — FFmpeg hwaccel can still work.
     if cfg.gpu_accel:
         from vid2dataset.gpu_filters import device_summary
+        from vid2dataset.gpu_runtime import ensure_gpu_runtime
 
-        log.info("%s", device_summary())
+        ok, err = ensure_gpu_runtime()
+        if ok:
+            log.info("%s", device_summary())
+        else:
+            log.warning("PyTorch CUDA unavailable (%s). Filters use CPU.", err)
 
     selected_hwaccel: str | None = None
     if cfg.gpu_accel and has_ffmpeg():
