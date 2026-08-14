@@ -92,7 +92,7 @@ function buildTopBar(store: Store, onRun: () => void, onLanguage: () => void): H
   const bar = el("header", "runbar");
   bar.append(instrumentMark("mark"));
   const identity = el("div", "id");
-  identity.append(el("span", "name", t("appname")), el("span", "code", "DATASET PREPARATION INSTRUMENT // V1.3.0"));
+  identity.append(el("span", "name", t("appname")), el("span", "code", "DATASET PREPARATION INSTRUMENT // V1.3.1"));
   const spacer = el("div", "spacer");
   const preset = el("div", "preset");
   preset.append(el("span", "plabel", t("preset")));
@@ -144,7 +144,7 @@ function buildTopBar(store: Store, onRun: () => void, onLanguage: () => void): H
 
 function buildRail(store: Store, active: ViewKey, onNavigate: (key: ViewKey) => void, onAbout: () => void): HTMLElement {
   const rail = el("aside", "viewrail");
-  rail.append(el("div", "abbr", "RL-EXTRACT-OS // V1.3.0"), el("div", "section-label", t("views")));
+  rail.append(el("div", "abbr", "RL-EXTRACT-OS // V1.3.1"), el("div", "section-label", t("views")));
   const nav = el("nav");
   const labels = ["v_source", "v_params", "v_caption", "v_roster", "v_execute"];
   VIEW_KEYS.forEach((key, index) => {
@@ -186,7 +186,7 @@ function buildAboutModal(): HTMLElement {
   center.append(githubMark());
   center.append(el("div", "about-url", "github.com/peter119lee/vid2dataset"));
   const version = el("div", "about-version", "vid2dataset ");
-  version.append(el("span", "v", "V1.3.0"));
+  version.append(el("span", "v", "V1.3.1"));
   const note = el("div", "about-note");
   const actions = el("div", "about-actions");
   const install = renderButton({ label: t("install_update"), variant: "fill" });

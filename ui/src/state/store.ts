@@ -284,10 +284,10 @@ export class Store {
       };
       this.notify();
       if (!runtime.available && runtime.can_download) await gpuDownload();
-      else if (!runtime.available) this.setParam("gpu_accel", false);
+      // Keep gpu_accel on even if PyTorch is missing: FFmpeg NVDEC/QSV can
+      // still accelerate decode. Filters fall back to CPU in the engine.
     } catch (error) {
       this.gpu = { ...this.gpu, status: "error", message: String(error) };
-      this.setParam("gpu_accel", false);
       this.notify();
     }
   }
@@ -483,9 +483,10 @@ export class Store {
       }
       if (this.gpu.status !== "ready" || !this.gpu.runtime?.available) {
         const reason = this.gpu.message || "CUDA runtime is not installed";
-        this.setParam("gpu_accel", false);
         this.run.start();
-        this.run.appendLog(`[WARN] GPU unavailable (${reason}). Continuing on CPU.`);
+        this.run.appendLog(
+          `[WARN] PyTorch CUDA unavailable (${reason}). Continuing; FFmpeg hardware decode is still attempted and filters use CPU.`,
+        );
         await startRun(this.buildConfig() as ExtractConfig);
         return;
       }

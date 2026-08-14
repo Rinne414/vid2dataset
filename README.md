@@ -47,9 +47,13 @@ No Python needed. / 不需要 Python。
 
 ### Option B: GPU acceleration / GPU 加速
 
-NVIDIA users get GPU SSIM speedup by ticking **GPU 加速** in the app. The first time you enable it, the app downloads PyTorch + CUDA 12.6 (12.8 on RTX 50-series) (~2.5-2.7 GB) to `%LOCALAPPDATA%/vid2dataset/gpu_runtime/`. Subsequent runs use the cached runtime — no re-download. / 首次勾选会下载 PyTorch + CUDA（约 2.5-2.7 GB）到本地快取，之后直接使用。
+Works on **Windows and Linux** (NVIDIA). Missing PyTorch never blocks extract.
 
-No separate GPU .exe needed any more.
+- **Windows .exe**: tick **GPU 加速** once. The app downloads PyTorch + CUDA 12.6 (12.8 on RTX 50-series) (~2.5-2.7 GB) to `%LOCALAPPDATA%/vid2dataset/gpu_runtime/`. Later runs reuse the cache.
+- **Linux (source)**: `./venv/bin/pip install torch --index-url https://download.pytorch.org/whl/cu126` (cu128 for RTX 50). Then tick GPU in the app.
+- If CUDA is missing, filters stay on CPU and FFmpeg still tries NVDEC/VAAPI.
+
+Windows `.exe` 首次勾选会下载到本地快取；Linux 需在 venv 里自行安装 CUDA 版 PyTorch。没装也能提取。
 
 ### Auto-tagging / 自动打标 (v1.0)
 

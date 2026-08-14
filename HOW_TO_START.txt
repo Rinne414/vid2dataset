@@ -30,14 +30,17 @@ WINDOWS（推荐）
 
 MAC / LINUX（从源码）
 --------------------
-  python -m venv venv
-  source venv/bin/activate
-  pip install -e .
-  vid2dataset app
+  1. 在终端进入本文件夹
+  2. 运行：  chmod +x start.sh && ./start.sh
+  3. 如果还不能开，按脚本提示先装一次 venv，再运行 ./start.sh
+
+  想用 NVIDIA GPU（Linux）：
+    ./venv/bin/pip install torch --index-url https://download.pytorch.org/whl/cu126
+    RTX 50 系改用 cu128。没装也能用，只是走 CPU。
 
 开发者新界面（Tauri，需要 Node + Rust）
 --------------------------------------
-  不是小白入口。请先用上面的 .exe / START.bat。
+  不是小白入口。请先用上面的 .exe / START.bat / start.sh。
   python scripts/run_tauri.py dev
 
 Need help with parameters?  See USAGE.md

@@ -307,3 +307,51 @@ def test_runtime_status_old_manifest_not_cached(tmp_path, monkeypatch) -> None:
     st = gr.runtime_status()
     assert st.cached is False  # version bump invalidates the v0.8 cache
     assert st.cuda_tag is None
+
+
+def test_default_runtime_dir_is_os_specific(monkeypatch, tmp_path) -> None:
+    monkeypatch.delenv("VID2DATASET_GPU_RUNTIME", raising=False)
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path / "win"))
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "xdg"))
+    if gr.sys.platform == "win32":
+        path = gr.default_runtime_dir()
+        assert path == tmp_path / "win" / "vid2dataset" / "gpu_runtime"
+    else:
+        path = gr.default_runtime_dir()
+        assert path == tmp_path / "xdg" / "vid2dataset" / "gpu_runtime"
+    monkeypatch.setenv("VID2DATASET_GPU_RUNTIME", str(tmp_path / "custom"))
+    assert gr.default_runtime_dir() == tmp_path / "custom"
+
+
+def test_ensure_gpu_runtime_uses_live_torch(monkeypatch) -> None:
+    monkeypatch.setattr(gr, "activate_runtime", lambda: (_ for _ in ()).throw(AssertionError("cache")))
+
+    class FakeCuda:
+        @staticmethod
+        def is_available() -> bool:
+            return True
+
+    fake = SimpleNamespace(cuda=FakeCuda)
+    monkeypatch.setitem(__import__("sys").modules, "torch", fake)
+    ok, err = gr.ensure_gpu_runtime()
+    assert ok is True
+    assert err == ""
+
+
+def test_ensure_gpu_runtime_linux_message_without_cache(monkeypatch, tmp_path) -> None:
+    monkeypatch.setattr(gr, "RUNTIME_DIR", tmp_path)
+    monkeypatch.setattr(gr.sys, "platform", "linux")
+    # Force the import-torch path to miss.
+    import builtins
+
+    real_import = builtins.__import__
+
+    def no_torch(name, *args, **kwargs):
+        if name == "torch" or name.startswith("torch."):
+            raise ImportError("No module named 'torch'")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", no_torch)
+    ok, err = gr.ensure_gpu_runtime()
+    assert ok is False
+    assert "pip install torch" in err

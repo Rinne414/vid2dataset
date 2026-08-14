@@ -4,6 +4,17 @@ All notable changes to vid2dataset are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning is [SemVer](https://semver.org/).
 
+## [1.3.1] - 2026-08-14
+
+### Fixed — Windows + Linux GPU
+
+- Extract now **activates** a cached/source CUDA runtime before filters run.
+  Ticking GPU no longer fails just because `torch` is not in the venv.
+- Missing PyTorch no longer turns GPU off: FFmpeg NVDEC/VAAPI can still
+  accelerate decode; SSIM filters fall back to CPU.
+- Linux start entry: `start.sh`. GPU cache path uses XDG on Unix.
+- CLI: `vid2dataset extract ... --gpu`.
+
 ## [1.3.0] - 2026-08-14
 
 ### Added — easier start + Tauri desktop (optional)

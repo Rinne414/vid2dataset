@@ -67,7 +67,15 @@ def best_device() -> str:
 
 def is_gpu_pipeline_available() -> bool:
     """True if torch is installed AND a non-CPU device is available."""
-    return _ensure_torch() and best_device() != "cpu"
+    if _ensure_torch() and best_device() != "cpu":
+        return True
+    try:
+        from vid2dataset.gpu_runtime import ensure_gpu_runtime
+
+        ok, _ = ensure_gpu_runtime()
+        return bool(ok and _ensure_torch() and best_device() != "cpu")
+    except Exception:
+        return False
 
 
 def device_summary() -> str:
