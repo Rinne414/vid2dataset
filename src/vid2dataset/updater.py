@@ -20,7 +20,7 @@ from vid2dataset import __version__
 
 log = logging.getLogger(__name__)
 
-GITHUB_OWNER = "peter119lee"
+GITHUB_OWNER = "Rinne414"
 GITHUB_REPO = "vid2dataset"
 RELEASES_API = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}/releases/latest"
 

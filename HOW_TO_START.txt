@@ -5,15 +5,30 @@
 
 WINDOWS（推荐）
 --------------
-方法 A（最简单，不用装 Python）
+方法 1（最简单）：只下一个文件
   1. 打开：https://github.com/Rinne414/vid2dataset/releases
-  2. 下载 vid2dataset.exe
-  3. 双击 vid2dataset.exe
+  2. 下载  vid2dataset.exe
+  3. 双击  vid2dataset.exe
 
   如果弹出「Windows 已保护你的电脑」：
     点「更多信息」→「仍要运行」。
 
-方法 B（你已经下载了整个文件夹）
+方法 2：下载 zip 压缩包
+  1. 同一页下载  vid2dataset-*-windows.zip
+  2. 右键 zip →「全部解压缩」/ Extract All
+     解压到任意文件夹（例如桌面的 vid2dataset）
+  3. 打开解压出来的文件夹
+  4. 双击  START.bat  或  双击启动.bat
+     （里面也有 vid2dataset.exe，双击 exe 也可以）
+  5. 以后都进这个文件夹再双击，不要只把 exe 单独拖走而丢掉 START.bat
+
+  解压后你会看到：
+    vid2dataset.exe     ← 主程序
+    START.bat           ← 双击启动（英文名）
+    双击启动.bat        ← 双击启动（中文名）
+    HOW_TO_START.txt    ← 这份说明
+
+方法 3（你已经有整个源码文件夹）
   1. 双击  START.bat     （或  双击启动.bat）
   2. 如果还不能开：先双击  install.bat，等它装完，再双击 START.bat
   3. 桌面会出现快捷方式，以后点那个也可以

@@ -21,14 +21,12 @@ deduplicated, properly bucketed image dataset — no coding required.
 
 **Windows — 不用会编程：**
 
-1. Download **`vid2dataset.exe`** from [Releases](https://github.com/Rinne414/vid2dataset/releases)  
-   到 [Releases](https://github.com/Rinne414/vid2dataset/releases) 下载 **`vid2dataset.exe`**
-2. Double-click it. / **双击**它。
-3. Pick input folder → pick output folder → click Extract.  
-   选视频文件夹 → 选输出文件夹 → 点提取。
+**方法 1（最快）：** 到 [Releases](https://github.com/Rinne414/vid2dataset/releases) 下载 **`vid2dataset.exe`**，双击。
 
-If you cloned the whole folder instead: double-click **`START.bat`** (or **`双击启动.bat`**).  
-If that cannot start yet, double-click **`install.bat`** once, then `START.bat` again.
+**方法 2（zip）：** 下载 **`vid2dataset-*-windows.zip`** → 右键「全部解压缩」→ 打开文件夹 → 双击 **`双击启动.bat`**（或 `START.bat`）。
+
+然后：选视频文件夹 → 选输出文件夹 → 点提取。  
+软件右上角有 **「检查更新」**。
 
 SmartScreen popup? Click **More info** → **Run anyway**.  
 弹出「Windows 已保护你的电脑」？点 **更多信息** → **仍要运行**。
