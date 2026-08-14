@@ -70,7 +70,7 @@ export const SWITCHES: SwitchMeta[] = [
   {
     key: "gpu_accel",
     label: "GPU acceleration",
-    tip: "Uses validated NVDEC and CUDA proxy scaling. Strong similarity batches use CUDA when PyTorch CUDA is available. / 使用经验证的 NVDEC 与 CUDA 代理缩放；PyTorch CUDA 可用时强相似度批处理也走 CUDA。",
+    tip: "Uses validated NVDEC and CUDA filters when a GPU runtime is available. If torch/CUDA is missing, extraction continues on CPU. / 有 GPU runtime 时使用 NVDEC 与 CUDA 过滤；未安装 torch/CUDA 时自动改走 CPU，不会中止提取。",
   },
   {
     key: "output_mode",

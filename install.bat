@@ -50,16 +50,24 @@ powershell -NoProfile -Command ^
    $sc.Arguments = '-m vid2dataset app'; ^
    $sc.WorkingDirectory = '%~dp0'; ^
    $sc.IconLocation = '%~dp0.venv\Scripts\python.exe,0'; ^
-   $sc.Description = 'vid2dataset - Video to Training Set'; ^
+   $sc.Description = 'vid2dataset - double-click to start'; ^
    $sc.Save()"
 
 echo.
 echo  ╔══════════════════════════════════════╗
 echo  ║          Install Complete!           ║
 echo  ╠══════════════════════════════════════╣
-echo  ║  A shortcut has been created on     ║
-echo  ║  your Desktop. Double-click it      ║
-echo  ║  to launch vid2dataset.             ║
+echo  ║  NEXT / 下一步：                     ║
+echo  ║  Double-click  START.bat             ║
+echo  ║  or  双击启动.bat                    ║
+echo  ║  (also a shortcut on your Desktop)   ║
 echo  ╚══════════════════════════════════════╝
 echo.
-pause
+
+if exist "%~dp0START.bat" (
+    echo Launching now...
+    echo 正在启动...
+    call "%~dp0START.bat"
+) else (
+    pause
+)

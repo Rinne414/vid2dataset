@@ -1,0 +1,44 @@
+========================================
+ vid2dataset — how to start
+ 小白启动说明（不用会写代码）
+========================================
+
+WINDOWS（推荐）
+--------------
+方法 A（最简单，不用装 Python）
+  1. 打开：https://github.com/Rinne414/vid2dataset/releases
+  2. 下载 vid2dataset.exe
+  3. 双击 vid2dataset.exe
+
+  如果弹出「Windows 已保护你的电脑」：
+    点「更多信息」→「仍要运行」。
+
+方法 B（你已经下载了整个文件夹）
+  1. 双击  START.bat     （或  双击启动.bat）
+  2. 如果还不能开：先双击  install.bat，等它装完，再双击 START.bat
+  3. 桌面会出现快捷方式，以后点那个也可以
+
+打开软件之后
+------------
+  1. 选「输入」视频文件夹
+  2. 选「输出」图片文件夹
+  3. 预设选 anima-style（做二次元 / MMD 推荐）
+  4. 点「提取」
+
+  第一次不要开「GPU 加速」——没装 CUDA 也能用。
+  第一次不要开「自动打标」——会先下载大约 0.5–1.2 GB 模型。
+
+MAC / LINUX（从源码）
+--------------------
+  python -m venv venv
+  source venv/bin/activate
+  pip install -e .
+  vid2dataset app
+
+开发者新界面（Tauri，需要 Node + Rust）
+--------------------------------------
+  不是小白入口。请先用上面的 .exe / START.bat。
+  python scripts/run_tauri.py dev
+
+Need help with parameters?  See USAGE.md
+参数不会调？看 USAGE.md

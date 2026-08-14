@@ -6,8 +6,16 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 
-# Find the venv python
-venv_python = HERE / ".venv" / "Scripts" / "python.exe"
+# Find the venv python (install.bat uses .venv; some setups use venv)
+venv_python = HERE / "venv" / "Scripts" / "pythonw.exe"
+if not venv_python.exists():
+    venv_python = HERE / ".venv" / "Scripts" / "pythonw.exe"
+if not venv_python.exists():
+    venv_python = HERE / "venv" / "Scripts" / "python.exe"
+if not venv_python.exists():
+    venv_python = HERE / ".venv" / "Scripts" / "python.exe"
+if not venv_python.exists():
+    venv_python = HERE / "venv" / "bin" / "python"
 if not venv_python.exists():
     venv_python = HERE / ".venv" / "bin" / "python"
 

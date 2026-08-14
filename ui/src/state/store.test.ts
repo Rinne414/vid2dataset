@@ -183,7 +183,7 @@ describe("Store", () => {
     expect(store.config.gpu_accel).toBe(false);
   });
 
-  it("does not start extraction when GPU was requested but CUDA is unavailable", async () => {
+  it("falls back to CPU and still starts when GPU was requested but unavailable", async () => {
     vi.mocked(gpuStatus).mockResolvedValue({
       available: false,
       cached: false,
@@ -191,15 +191,19 @@ describe("Store", () => {
       cache_dir: "/cache",
       size_mb: 0,
       cuda_tag: null,
-      error: "CUDA is unavailable",
+      error: "Could not load PyTorch: ModuleNotFoundError: No module named 'torch'",
       can_download: false,
     });
     const store = new Store();
     store.config.gpu_accel = true;
 
-    await expect(store.start()).rejects.toThrow("CUDA is unavailable");
+    await store.start();
 
-    expect(store.run.status).toBe("idle");
-    expect(startRun).not.toHaveBeenCalled();
+    expect(store.config.gpu_accel).toBe(false);
+    expect(store.run.status).toBe("running");
+    expect(store.run.log.some((line) => line.includes("Continuing on CPU"))).toBe(true);
+    expect(startRun).toHaveBeenCalled();
+    const sent = vi.mocked(startRun).mock.calls[0]?.[0] as { gpu_accel?: boolean };
+    expect(sent.gpu_accel).toBe(false);
   });
 });
