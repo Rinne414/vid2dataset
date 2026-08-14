@@ -4,6 +4,26 @@ All notable changes to vid2dataset are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning is [SemVer](https://semver.org/).
 
+## [1.3.0] - 2026-08-14
+
+### Added — easier start + Tauri desktop (optional)
+
+- **Noob start entry**: `START.bat` / `双击启动.bat` and `HOW_TO_START.txt`.
+  Double-click the `.exe`, or `START.bat` after `install.bat`.
+- **Tauri desktop shell** (source / developer): TypeScript UI → Rust →
+  Python sidecar. Not required for the Windows `.exe` release.
+- Prefs (`~/.vid2dataset.json`) shared between the classic GUI and Tauri.
+- FFmpeg hardware-decoder selection: bundled binary as CPU fallback,
+  system FFmpeg when a hwaccel is requested.
+
+### Fixed
+
+- GPU switch no longer blocks extraction when PyTorch is missing — falls
+  back to CPU and continues.
+- Windows venv Python path (`venv\Scripts\python.exe`) for the Tauri
+  sidecar and `run_tauri.py`.
+- Windows CI FFmpeg candidate test (`Path.as_posix()` mock).
+
 ## [1.2.0] - 2026-07-11
 
 ### Added — Advanced mode (not just one click any more)

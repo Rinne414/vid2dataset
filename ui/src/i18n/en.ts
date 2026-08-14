@@ -61,7 +61,7 @@ export const en: Record<string, string> = {
   links: "LINKS",
   check_update: "CHECK UPDATE",
   github: "GITHUB REPO",
-  update_latest: "You have the latest version V1.2.0",
+  update_latest: "You have the latest version V1.3.0",
   update_checking: "Checking for updates…",
   processing: "Processing {name}… ({current}/{total})",
   eta: "ETA: {remaining}",

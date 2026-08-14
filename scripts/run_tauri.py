@@ -25,12 +25,35 @@ def _tauri_cli() -> Path:
     raise SystemExit("Tauri CLI is not installed; run pnpm install in ui first")
 
 
+def _dev_python() -> Path:
+    """Resolve the repo venv interpreter on Windows and Unix."""
+    if sys.platform == "win32":
+        candidates = (
+            REPO_ROOT / "venv" / "Scripts" / "python.exe",
+            REPO_ROOT / "venv" / "Scripts" / "python",
+        )
+    else:
+        candidates = (
+            REPO_ROOT / "venv" / "bin" / "python",
+            REPO_ROOT / "venv" / "bin" / "python3",
+        )
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    raise SystemExit(
+        "Dev venv Python not found. Create it first:\n"
+        "  python -m venv venv\n"
+        "  venv/Scripts/python -m pip install -e \".[dev]\"   # Windows\n"
+        "  venv/bin/python -m pip install -e \".[dev]\"       # Linux/macOS"
+    )
+
+
 def main() -> int:
     tauri_cli = _tauri_cli()
 
     env = os.environ.copy()
     if len(sys.argv) > 1 and sys.argv[1] == "dev":
-        env["VID2DATASET_PYTHON"] = str(REPO_ROOT / "venv" / "bin" / "python")
+        env["VID2DATASET_PYTHON"] = str(_dev_python())
         env["VID2DATASET_BRIDGE_SCRIPT"] = str(REPO_ROOT / "bridge" / "main.py")
     if sys.platform.startswith("linux"):
         site_packages = Path(sysconfig.get_paths()["purelib"])

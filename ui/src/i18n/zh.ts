@@ -61,7 +61,7 @@ export const zh: Record<string, string> = {
   links: "链接",
   check_update: "检查更新",
   github: "GitHub 仓库",
-  update_latest: "已是最新版本 V1.2.0",
+  update_latest: "已是最新版本 V1.3.0",
   update_checking: "正在检查更新…",
   processing: "正在处理 {name}… ({current}/{total})",
   eta: "预计剩余：{remaining}",

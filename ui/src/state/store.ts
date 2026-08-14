@@ -482,7 +482,12 @@ export class Store {
         await this.setGpuEnabled(true);
       }
       if (this.gpu.status !== "ready" || !this.gpu.runtime?.available) {
-        throw new Error(this.gpu.message || "GPU acceleration was requested, but CUDA is not ready");
+        const reason = this.gpu.message || "CUDA runtime is not installed";
+        this.setParam("gpu_accel", false);
+        this.run.start();
+        this.run.appendLog(`[WARN] GPU unavailable (${reason}). Continuing on CPU.`);
+        await startRun(this.buildConfig() as ExtractConfig);
+        return;
       }
     }
     this.run.start();

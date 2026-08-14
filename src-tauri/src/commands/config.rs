@@ -12,7 +12,7 @@ use crate::bridge::protocol::ErrorInfo;
 use crate::prefs;
 use crate::state::AppState;
 
-const VERSION: &str = "1.2.0";
+const VERSION: &str = "1.3.0";
 
 #[tauri::command]
 pub fn get_version() -> String {
