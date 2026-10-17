@@ -1,12 +1,14 @@
 """Update checker and one-click installer for vid2dataset.
 
 Queries the GitHub releases API to detect newer versions, downloads
-the new .exe, and writes a small batch script that swaps it on next
-launch (you can't replace a running .exe on Windows directly).
+the new .exe, verifies its SHA256 against the release, and writes a small
+batch script that swaps it on next launch (you can't replace a running
+.exe on Windows directly).
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
@@ -23,6 +25,12 @@ log = logging.getLogger(__name__)
 GITHUB_OWNER = "Rinne414"
 GITHUB_REPO = "vid2dataset"
 RELEASES_API = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}/releases/latest"
+RELEASES_PAGE = f"https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/releases"
+SHA256SUMS_NAME = "SHA256SUMS.txt"
+
+
+class UpdateVerificationError(Exception):
+    """The downloaded update could not be proven to match the release."""
 
 
 @dataclass(frozen=True)
@@ -33,6 +41,9 @@ class ReleaseInfo:
     notes: str          # markdown body
     exe_url: str | None # download URL of vid2dataset.exe asset
     exe_size: int       # bytes
+    exe_name: str = "vid2dataset.exe"
+    exe_digest: str | None = None   # lowercase sha256 hex from the API ``digest`` field
+    sums_url: str | None = None     # SHA256SUMS.txt asset, fallback when no digest
 
 
 def _parse_version(s: str) -> tuple[int, ...]:
@@ -61,23 +72,40 @@ def fetch_latest_release(timeout: float = 10.0) -> ReleaseInfo | None:
         log.warning("Update check failed: %s", e)
         return None
 
+    return parse_release(data)
+
+
+def _sha256_from_digest(digest: str | None) -> str | None:
+    """'sha256:ABC...' -> 'abc...'. None for missing or non-sha256 values."""
+    if not digest or not digest.lower().startswith("sha256:"):
+        return None
+    hex_part = digest.split(":", 1)[1].strip().lower()
+    return hex_part if len(hex_part) == 64 else None
+
+
+def parse_release(data: dict) -> ReleaseInfo:
+    """Build a ReleaseInfo from a GitHub releases API payload."""
     tag = data.get("tag_name", "")
     version = tag.lstrip("v")
-    exe_url = None
-    exe_size = 0
+    exe: dict = {}
+    sums_url = None
     for asset in data.get("assets", []):
-        if asset.get("name", "").lower().endswith(".exe"):
-            exe_url = asset.get("browser_download_url")
-            exe_size = int(asset.get("size", 0))
-            break
+        name = asset.get("name", "")
+        if not exe and name.lower().endswith(".exe"):
+            exe = asset
+        elif name.lower() == SHA256SUMS_NAME.lower():
+            sums_url = asset.get("browser_download_url")
 
     return ReleaseInfo(
         tag=tag,
         version=version,
         name=data.get("name", tag),
         notes=data.get("body", ""),
-        exe_url=exe_url,
-        exe_size=exe_size,
+        exe_url=exe.get("browser_download_url"),
+        exe_size=int(exe.get("size", 0)),
+        exe_name=exe.get("name", "vid2dataset.exe"),
+        exe_digest=_sha256_from_digest(exe.get("digest")),
+        sums_url=sums_url,
     )
 
 
@@ -116,6 +144,74 @@ def download_exe(
                     progress_cb(done, total)
 
     tmp.replace(dest)
+    return dest
+
+
+def _fetch_text(url: str, timeout: float = 15.0) -> str:
+    req = urllib.request.Request(url, headers={"User-Agent": f"vid2dataset/{__version__}"})
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return resp.read().decode("utf-8", errors="replace")
+
+
+def _sha256_from_sums(text: str, filename: str) -> str | None:
+    """Find ``filename`` in ``<hex>  <name>`` lines (``*`` binary marker allowed)."""
+    for line in text.splitlines():
+        parts = line.split(None, 1)
+        if len(parts) != 2:
+            continue
+        digest, name = parts[0].lower(), parts[1].strip().lstrip("*")
+        if name == filename and len(digest) == 64:
+            return digest
+    return None
+
+
+def resolve_expected_sha256(release: ReleaseInfo) -> str | None:
+    """API ``digest`` first, then the release's SHA256SUMS.txt. None if neither."""
+    if release.exe_digest:
+        return release.exe_digest
+    if release.sums_url:
+        try:
+            return _sha256_from_sums(_fetch_text(release.sums_url), release.exe_name)
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
+            log.warning("Could not read %s: %s", SHA256SUMS_NAME, e)
+    return None
+
+
+def _sha256_of_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        while chunk := f.read(1024 * 1024):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def download_verified_exe(
+    release: ReleaseInfo,
+    dest: Path,
+    progress_cb: callable | None = None,
+) -> Path:
+    """Download the release exe and prove it matches the release before use.
+
+    Raises ``UpdateVerificationError`` (and leaves no file at ``dest``) when
+    the expected hash cannot be found, the size differs, or the SHA256 differs.
+    """
+    dest.unlink(missing_ok=True)
+    expected = resolve_expected_sha256(release)
+    if expected is None:
+        raise UpdateVerificationError("no checksum published for this release")
+
+    download_exe(release.exe_url, dest, progress_cb=progress_cb)
+    try:
+        actual_size = dest.stat().st_size
+        if release.exe_size and actual_size != release.exe_size:
+            raise UpdateVerificationError(
+                f"size {actual_size} does not match release size {release.exe_size}"
+            )
+        if _sha256_of_file(dest) != expected:
+            raise UpdateVerificationError("SHA256 does not match the release")
+    except BaseException:
+        dest.unlink(missing_ok=True)
+        raise
     return dest
 
 
