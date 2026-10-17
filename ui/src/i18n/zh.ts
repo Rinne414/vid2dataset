@@ -121,5 +121,6 @@ export const zh: Record<string, string> = {
   installing_update: "正在安装更新…",
   update_staged: "更新已准备，重启后应用。",
   update_not_installed: "未安装更新：{reason}",
+  update_verify_failed: "下载的更新未通过校验，已放弃安装。请到 {url} 手动下载最新版",
   update_available: "发现更新：V{version}",
 };

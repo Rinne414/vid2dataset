@@ -111,7 +111,7 @@ export function checkUpdateInfo(): Promise<UpdateInfo> {
   return invoke("check_update");
 }
 
-export function installUpdate(): Promise<{ installed: boolean; reason?: string }> {
+export function installUpdate(): Promise<{ installed: boolean; reason?: string; releases_url?: string }> {
   return invoke("install_update");
 }
 

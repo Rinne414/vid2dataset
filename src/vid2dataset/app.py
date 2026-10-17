@@ -715,7 +715,12 @@ class App(ctk.CTk):
 
     def _do_update(self, release) -> None:
         """Download new exe and stage replacement."""
-        from vid2dataset.updater import download_exe, install_update
+        from vid2dataset.updater import (
+            RELEASES_PAGE,
+            UpdateVerificationError,
+            download_verified_exe,
+            install_update,
+        )
 
         if not release.exe_url:
             self.after(
@@ -740,7 +745,19 @@ class App(ctk.CTk):
                 )
 
         try:
-            download_exe(release.exe_url, target, progress_cb=progress_cb)
+            download_verified_exe(release, target, progress_cb=progress_cb)
+        except UpdateVerificationError as exc:
+            logging.getLogger(__name__).warning("Update refused: %s", exc)
+            self.after(0, lambda: self.progress.stop())
+            self.after(
+                0,
+                lambda: messagebox.showerror(
+                    t("error", self.lang),
+                    t("update_verify_failed", self.lang, url=RELEASES_PAGE),
+                ),
+            )
+            self.after(0, lambda: self.update_btn.configure(state="normal"))
+            return
         except Exception as exc:
             err = str(exc)
             self.after(0, lambda: self.progress.stop())

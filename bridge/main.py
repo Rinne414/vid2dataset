@@ -410,7 +410,9 @@ def _update_install(_params: dict) -> dict:
     from pathlib import Path
 
     from vid2dataset.updater import (
-        download_exe,
+        RELEASES_PAGE,
+        UpdateVerificationError,
+        download_verified_exe,
         fetch_latest_release,
         install_update,
         is_newer,
@@ -426,7 +428,11 @@ def _update_install(_params: dict) -> dict:
         return {"installed": False, "reason": "not-exe"}
 
     target = Path(sys.executable).parent / "vid2dataset_new.exe"
-    download_exe(rel.exe_url, target)
+    try:
+        download_verified_exe(rel, target)
+    except UpdateVerificationError as e:
+        log.warning("Update refused: %s", e)
+        return {"installed": False, "reason": "verify-failed", "releases_url": RELEASES_PAGE}
     install_update(target)
     return {"installed": True}
 

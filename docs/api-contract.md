@@ -73,7 +73,7 @@ stdout 只写协议帧；Python 日志输出到 **stderr**（Rust 单独线程�
 | `gpu.status` | `{}` | `RuntimeStatus` | ✅ 真接通 |
 | `gpu.download` | `{}` | `{"started": true}`（事件流 `download.progress` → `download.done`） | ✅ 真接通 |
 | `update.check` | `{}` | `{"available": bool, tag?, version?, name?, notes?, exe_url?, exe_size?}` | ✅ 真接通 |
-| `update.install` | `{}` | `{"installed": bool, reason?}`（`not-exe`/`up-to-date`/`no-release`） | ✅ 真接通 |
+| `update.install` | `{}` | `{"installed": bool, reason?}`（`not-exe`/`up-to-date`/`no-release`/`verify-failed`（附 `releases_url`）） | ✅ 真接通 |
 | `advanced.open` | `{"path": str}` | `VideoMeta` | ✅ 真接通 |
 | `advanced.seek` | `{"path": str, "frame": int}` | `{"frame_b64": str}`（JPEG base64） | ✅ 真接通 |
 | `advanced.capture` | `{"path": str, "frame": int, "config": {...}}` | `{"out_path": str}` | ✅ 真接通 |

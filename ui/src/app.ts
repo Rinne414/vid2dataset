@@ -195,7 +195,9 @@ function buildAboutModal(): HTMLElement {
     note.textContent = t("installing_update");
     try {
       const result = await installUpdate();
-      note.textContent = result.installed ? t("update_staged") : t("update_not_installed", { reason: result.reason ?? "unknown" });
+      if (result.installed) note.textContent = t("update_staged");
+      else if (result.reason === "verify-failed") note.textContent = t("update_verify_failed", { url: result.releases_url ?? "" });
+      else note.textContent = t("update_not_installed", { reason: result.reason ?? "unknown" });
     } catch (error) {
       note.textContent = String(error);
     }

@@ -121,5 +121,6 @@ export const en: Record<string, string> = {
   installing_update: "Installing update…",
   update_staged: "Update staged — restart to apply.",
   update_not_installed: "Update not installed: {reason}",
+  update_verify_failed: "The downloaded update could not be verified, so it was NOT installed. Please download it manually from {url}",
   update_available: "Update available: V{version}",
 };
