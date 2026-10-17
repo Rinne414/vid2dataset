@@ -4,6 +4,24 @@ All notable changes to vid2dataset are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning is [SemVer](https://semver.org/).
 
+## [1.3.2] - 2026-10-17
+
+### Security / 安全
+
+- The in-app updater now **verifies the download** before installing it: the
+  SHA256 and size must match the release (`digest` from GitHub, or the
+  release's `SHA256SUMS.txt`). A download that does not match, or a release
+  with no checksum, is deleted and nothing is installed; the app points you
+  to the releases page for a manual download.
+- 应用内更新现在会在安装前**校验下载文件**：SHA256 与大小必须与发布页一致
+  （GitHub 的 `digest`，或发布页的 `SHA256SUMS.txt`）。校验失败或发布页没有
+  校验值时，下载文件会被删除、不会安装任何东西，并提示到发布页手动下载。
+
+### Added
+
+- `scripts/make_release_assets.py` builds the windows zip and writes
+  `SHA256SUMS.txt` for the release.
+
 ## [1.3.1] - 2026-08-14
 
 ### Fixed — Windows + Linux GPU

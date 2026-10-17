@@ -1,6 +1,6 @@
 [package]
 name = "vid2dataset"
-version = "1.3.1"
+version = "1.3.2"
 description = "Smart video-to-image extractor for LoRA training sets (Tauri shell)"
 authors = ["vid2dataset contributors"]
 license = "MIT"
